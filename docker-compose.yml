@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  postgres-eventstore:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: eventstore
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./migrations/001_create_events_table.sql:/docker-entrypoint-initdb.d/001.sql
+      - postgres-eventstore-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d eventstore"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-readmodel:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: readmodel
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./migrations/002_create_read_model.sql:/docker-entrypoint-initdb.d/002.sql
+      - postgres-readmodel-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d readmodel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-eventstore-data:
+  postgres-readmodel-data:
