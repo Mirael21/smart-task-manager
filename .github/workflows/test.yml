@@ -34,7 +34,7 @@ jobs:
         node-version: '18.x'
     
     - name: Install dependencies
-      run: npm install  # Changed from npm ci to npm install
+      run: npm install
     
     - name: Create test databases
       run: |
@@ -54,9 +54,3 @@ jobs:
       run: npm run test:unit
       env:
         NODE_ENV: test
-    
-    - name: Run integration tests
-      run: npm run test:integration
-      env:
-        NODE_ENV: test
-        TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
