@@ -40,7 +40,7 @@ Event-driven система управления задачами с испол�
 
 ```bash
 # 1. Клонировать репозиторий
-git clone <your-repo-url>
+git clone <https://github.com/Mirael21/smart-task-manager>
 cd smart-task-manager
 
 # 2. Запустить инфраструктуру
