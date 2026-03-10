@@ -7,12 +7,14 @@
     "test": "tests"
   },
   "scripts": {
-    "dev": "ts-node-dev --project tsconfig.dev.json --respawn src/index.ts",
+    "dev": "ts-node-dev --respawn src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
     "test:unit": "jest tests/unit",
     "test:integration": "jest tests/integration",
+    "test:coverage": "jest --coverage",
+    "test:event-loop": "jest tests/unit/event.*.test.ts",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "migrate:up": "ts-node scripts/migrate.ts"
@@ -21,11 +23,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bull": "^4.16.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-handlebars": "^8.0.6",
+    "ioredis": "^5.10.0",
+    "nodemailer": "^8.0.2",
     "pg": "^8.18.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "uuid": "^13.0.0",
     "winston": "^3.19.0"
   },
@@ -34,7 +42,9 @@
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.3.0",
+    "@types/nodemailer": "^7.0.11",
     "@types/pg": "^8.16.0",
+    "@types/socket.io": "^3.0.2",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^11.0.0",
     "concurrently": "^9.2.1",

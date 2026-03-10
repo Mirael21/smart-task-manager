@@ -1,0 +1,54 @@
+<!-- src/api/views/index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Event Driven</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <p class="subtitle">Event-Driven Architecture Demo</p>
+
+        <div class="stats-panel">
+            <h3>Статистика</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Всего задач:</span>
+                    <span id="totalTasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">В очереди событий:</span>
+                    <span id="queueSize">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">WebSocket клиентов:</span>
+                    <span id="wsClients">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-task">
+            <h3>Создать задачу</h3>
+            <input type="text" id="taskTitle" placeholder="Название задачи">
+            <input type="text" id="taskDescription" placeholder="Описание">
+            <button onclick="createTask()">Создать</button>
+        </div>
+
+        <div class="tasks-list">
+            <h3>Список задач</h3>
+            <div id="tasks"></div>
+        </div>
+
+        <div class="event-log">
+            <h3>Event Log</h3>
+            <div id="events"></div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>
