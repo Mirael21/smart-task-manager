@@ -14,6 +14,10 @@ import { EventProcessor, EventHandler } from './event-loop/event.processor';  //
 import { EmailHandler } from './application/event.handlers/email.handler';
 import { NotificationHandler } from './application/event.handlers/notification.handler';
 import { AnalyticsHandler } from './application/event.handlers/analytics.handler';
+import { SagaStore } from './saga/saga.store';
+import { SagaOrchestrator } from './saga/saga.orchestrator';
+import { TaskCompletionSaga } from './saga/sagas/task.completion.saga';
+import { SagaHandler } from './saga/saga.handler';
 
 const app = express();
 const server = http.createServer(app);
@@ -53,9 +57,15 @@ async function bootstrap() {
     const projector = new TaskProjector(readPool);
     const wsServer = new WebSocketServer(server);
     const eventQueue = new PriorityEventQueue();
+    const sagaStore = new SagaStore();
+    const sagaOrchestrator = new SagaOrchestrator(sagaStore);
 
     // Регистрируем обработчики событий
     const handlers = new Map<string, EventHandler[]>();  // ← ТЕПЕРЬ EventHandler найден!
+    const taskCompletionSaga = new TaskCompletionSaga(eventStore, eventQueue);
+    sagaOrchestrator.register(taskCompletionSaga);
+    await sagaOrchestrator.recover();
+    const sagaHandler = new SagaHandler(sagaOrchestrator);
 
     // ВАЖНО: проектор теперь может быть добавлен как обработчик!
     handlers.set('TaskCreated', [
@@ -63,13 +73,15 @@ async function bootstrap() {
       new NotificationHandler(),
       new AnalyticsHandler(),
       projector  // ← projector implements EventHandler
+      
     ]);
 
     handlers.set('TaskCompleted', [
       new EmailHandler(),
       new NotificationHandler(),
       new AnalyticsHandler(),
-      projector
+      projector,
+      new SagaHandler(sagaOrchestrator)
     ]);
 
     handlers.set('TaskUpdated', [
@@ -189,6 +201,18 @@ app.get('/debug/queue', (req, res) => {
   } catch (error) {
     res.status(500).json({ error: String(error) });
   }
+});
+app.get('/debug/sagas', (req, res) => {
+  res.json({
+    active: sagaOrchestrator.getActive(),
+    all: sagaStore.getAll().map(s => ({
+      id: s.id,
+      name: s.name,
+      status: s.status,
+      stepsCompleted: s.stepsCompleted.length,
+      createdAt: s.createdAt
+    }))
+  });
 });
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
